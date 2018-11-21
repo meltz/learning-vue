@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="product-style.css">
+    <style>
+    </style>
+</head>
+<body>
+
+<div class="nav-bar"></div>
+<div id="app">
+    <div class="cart">
+        <p>Cart({{ cart.length }})</p>
+    </div>
+
+    <product :premium="premium" @add-to-cart="updateCart"></product>
+</div>
+
+<script>
+Vue.component('product', {
+    props: {
+        premium: {
+            type: Boolean,
+            required: true
+        }
+    },
+    template: `
+        <div class="product">
+            <div class="product-image">
+                <img :src="image" alt="">
+            </div>
+            <div class="product-info">
+                <h1>{{ title }}</h1>
+                <!-- <p v-if="inventory >= 10">In Stock</p>
+                <p v-else-if="inventory > 0 && inventory < 10">Almost Sold Out</p>
+                <p v-else>Out of Stock</p> -->
+                <p v-if="inStock">In Stock</p>
+                <p v-else>Sold Out</p>
+                <p>Shipping: {{ shipping }}</p>
+                <ul>
+                    <li v-for="detail in details">{{ detail }}</li>
+                </ul>
+                <div v-for="(variant, index) in variants"
+                    :key="variant.variantID"
+                    class="color-box"
+                    :style="{'background-color': variant.variantColor}"
+                    @mouseover="updateProduct(index)"
+                    >
+                </div>
+                <div>
+                    <button @click="addToCart"
+                    :disabled="!inStock"
+                    :class="{disabledButton: !inStock}"
+                    >Add to Cart</button>
+                </div>
+            </div>
+
+            <h2>Reviews</h2>
+            <p v-if="!reviews.length">There are no reviews yet.</p>
+            <ul>
+                <li v-for="review in reviews">
+                    <p>{{ review.name }}</p>
+                    <p>{{ review.rating }}</p>
+                    <p>{{ review.review }}</p>
+                </li>
+            </ul>
+
+            <product-review @review-submitted="addReview"></product-review>
+
+        </div>
+
+    `,
+    data() {
+        return {
+            brand: 'Vue Mastery',
+            products: 'Socks',
+            // image: 'products/green-socks.jpg',
+            selectedVariant: 0,
+            // inStock: false,
+            inventory: 100,
+            details: ['80% cotton', '20% polyester', 'Gender-neutral'],
+            variants: [
+                {
+                    variantID: 2235,
+                    variantColor: 'green',
+                    variantImage: 'products/green-socks.jpg',
+                    variantQuality: 10,
+                },
+                {
+                    variantID: 2236,
+                    variantColor: 'blue',
+                    variantImage: 'products/blue-socks.jpg',
+                    variantQuality: 2,
+                }
+            ],
+            reviews: []
+        }
+    },
+    methods: {
+        addToCart() {
+            this.$emit('add-to-cart', this.variants[this.selectedVariant].variantID)
+        },
+        updateProduct(index) {
+            this.selectedVariant = index
+            console.log(index)
+        },
+        addReview(productReview) {
+            this.reviews.push(productReview)
+        }
+    },
+    computed: {
+        title() {
+            return this.brand + ' ' + this.products
+        },
+        image() {
+            return this.variants[this.selectedVariant].variantImage
+        },
+        inStock() {
+            return this.variants[this.selectedVariant].variantQuality
+        },
+        shipping() {
+            return this.premium ? 'Free' : '$' + 2.99
+        }
+    }
+})
+
+Vue.component('product-review', {
+    template: `
+        <form class="review-form form" @submit.prevent="onSubmit">
+
+            <p v-if="errors.length">
+                <strong>Please correct this error(s)</strong>
+                <ul>
+                    <li v-for="error in errors">{{ error }}</li>
+                </ul>
+            </p>
+
+            <p>
+                <label for="name">Name:</label>
+                <input id="name" v-model="name" class="form">
+            </p>
+            <p>
+                <label for="review">Review:</label>
+                <textarea id="review" name="review" v-model="review" class="form"></textarea>
+            </p>
+            <p>
+                <label for="rating">Rating:</label>
+                <select name="rating" id="rating" v-model.number="rating">
+                <option value="5" selected>5</option>
+                <option value="4">4</option>
+                <option value="3">3</option>
+                <option value="2">2</option>
+                <option value="1">1</option>
+                </select>
+            </p>
+            <button>Submit Review</button>
+        </form>
+    `,
+    data() {
+        return {
+            name: null,
+            review: null,
+            rating: null,
+            errors: []
+        }
+    },
+    methods: {
+        onSubmit() {
+            if(this.name && this.review && this.rating) {
+                let productReview = {
+                    name: this.name,
+                    review: this.review,
+                    rating: this.rating,
+                }
+                this.$emit('review-submitted', productReview)
+                this.name = null,
+                this.review = null,
+                this.rating = null
+            }
+            else {
+                if(!this.name) this.errors.push("Name required.")
+                if(!this.review) this.errors.push("Review required.")
+                if(!this.rating) this.errors.push("Rating required.")
+            }
+        }
+    }
+})
+
+var app = new Vue({
+    el: '#app',
+    data: {
+        premium: true,
+        cart: []
+    },
+    methods: {
+        updateCart(id) {
+            this.cart.push(id)
+        }
+    }
+})
+</script>
+
+</body>
+</html>

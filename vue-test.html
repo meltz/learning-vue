@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <style>
+        .area {
+            margin-top: 100px;
+            padding: 50px;
+            background-color: red;
+        }
+
+        .dummy {
+            display: block;
+            background: black;
+            color: white;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="root" class="container">
+        <p>{{ counter }}</p>
+        <button @click="increase(3, $event)">Increase</button>
+        <button @click="decrease(2)">Decrease</button>
+
+        <br><br>
+        <input type="text" @keyup.enter.space="alertMe">
+
+        <p class="area" @mousemove="updateCoordinates">
+            The coordinate: {{ x }} / {{ y }}
+            <span v-on:mouseover.stop class="dummy">DEAD SPOT</span>
+        </p>
+    </div>
+
+    <script>
+        new Vue ({
+            el: '#root',
+            data: {
+                counter: 0,
+                x: 0,
+                y: 0
+            },
+            methods: {
+                increase(step, event) {
+                    this.counter += step;
+                    console.log(event)
+                },
+                decrease(step) {
+                    this.counter -= step;
+                },
+                updateCoordinates(event) {
+                    this.x = event.clientX;
+                    this.y = event.clientY;
+                },
+                alertMe() {
+                    alert('Alert Me');
+                }
+                // dummy(event) {
+                //     event.stopPropagation();
+                //     console.log('stpp1');
+                // }
+            }
+        });
+
+    </script>
+
+</body>
+
+</html>

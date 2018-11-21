@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <style>
+        .strikeout
+        {
+            text-decoration: line-through;
+            color: #ccc;
+        }
+        .priority
+        {
+            color: orange;
+        }
+        .item-list li
+        {
+            cursor: pointer;
+        }
+    </style>
+
+</head>
+<body>
+<div class="container" id="shopping-list">
+    <div class="row">
+        <div class="col-xs-6">
+            <h1>{{ header }}</h1>
+        </div>
+        <div class="col-xs-6">
+            <button v-if="state === 'default'" class="btn btn-primary" @click="changeState('edit')">Add Item</button>
+            <button v-else class="btn btn-danger" @click="changeState('default')">Cancel</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div v-if="state === 'edit'">
+                <input type="text" placeholder="Add an item" v-model="newItem" @keyup.enter="addItem" class="form">
+                <button @click="addItem" :disabled="newItem.length === 0" class="btn btn-primary">Save</button>
+            </div>
+
+            <!-- <a :href="newItem" target="_blank">Dynamic Links</a> -->
+
+            <ul class="item-list">
+                <li v-for="item in reversedItems" :class="{strikeout: item.purchased}" @click="togglePurchased(item)">{{ item.label }}</li>
+            </ul>
+            <p v-if="items.length === 0">Nice Job! You have bought all items</p>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var shoppingList = new Vue ({
+        el: '#shopping-list',
+        data: {
+            state: 'default',
+            header: 'Shopping List app',
+            newItem: '',
+            items: [
+                {
+                    label: '10 party hats',
+                    purchased: false,
+                    highPiority: false,
+                },
+                {
+                    label: '2 board games',
+                    purchased: true,
+                    highPiority: false,
+                },
+                {
+                    label: '100 cups',
+                    purchased: false,
+                    highPiority: true,
+                },
+            ]
+        },
+        computed: {
+            reversedItems() {
+                return this.items.slice(0).reverse();
+            }
+        },
+        methods: {
+            addItem() {
+                this.items.push({
+                    label: this.newItem,
+                    purchased: false,
+                    highPiority: false,
+                },);
+
+                this.newItem = '';
+            },
+            changeState(newState) {
+                this.state = newState;
+                this.newItem = '';
+            },
+            togglePurchased(item) {
+                item.purchased = !item.purchased;
+            }
+        }
+    })
+</script>
+
+</body>
+</html>

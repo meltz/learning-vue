@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+    <style>
+        .demo
+        {
+            display: inline-block;
+            background: grey;
+            width: 100px;
+            height: 100px;
+            margin: 10px;
+        }
+
+        .red
+        {
+            background: red;
+        }
+
+        .blue
+        {
+            background: blue;
+        }
+
+        .green
+        {
+            background: green;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div
+            class="demo"
+            @click="changeRed"
+            :class="attachedRed"
+        >
+        </div>
+
+        <div class="demo"></div>
+
+        <div class="demo" :class="color"></div>
+
+        <input type="text" v-model="color">
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                color: 'green',
+                attachedRed: 'red'
+            },
+            methods: {
+                changeRed() {
+                    return this.attachedRed == 'red' ? this.attachedRed = '' : this.attachedRed = 'red';
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>
