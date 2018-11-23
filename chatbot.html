@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+  <script src="https://www.gstatic.com/firebasejs/5.5.9/firebase.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+</head>
+<body>
+<div id="chat" class="container">
+    <h1>Vue School Chat Room</h1>
+    <div v-for="message in messages" class="card">
+        <div class="card-body">
+            <h6 class="card-subtitle mb-2 text-muted">{{ message.nickname }}</h6>
+            <p class="card-text">{{ message.text }}</p>
+        </div>
+    </div>
+    <hr>
+    <form @submit.prevent="storeMessage">
+        <div class="form-group">
+            <label>Message:</label>
+            <textarea v-model="messageText" class="form-control"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Nickname:</label>
+            <input v-model="nickname" class="form-control">
+        </div>
+        <button class="btn btn-primary">Send</button>
+    </form>
+</div>
+<script>
+    // Initialize Firebase
+    const config = {
+        apiKey: "AIzaSyC0ra7Kq0TkAKqUcDjw-RmlsE8NB3PrkNo",
+        authDomain: "chatbot-518ec.firebaseapp.com",
+        databaseURL: "https://chatbot-518ec.firebaseio.com",
+        projectId: "chatbot-518ec",
+        storageBucket: "chatbot-518ec.appspot.com",
+        messagingSenderId: "31862629363"
+    };
+    firebase.initializeApp(config);
+
+    const database = firebase.database()
+
+    new Vue ({
+        el: '#chat',
+        data: {
+            messages: [],
+            messageText: '',
+            nickname: 'meltz'
+        },
+        methods: {
+            storeMessage() {
+                this.messages.push({ text: this.messageText, nickname: this.nickname })
+                this.messageText = ''
+            }
+        },
+        // If you link the created hook, you can directly execute code as soon as the program starts.
+        created() {
+            database.ref('messages').on('child_added', snapshot => this.messages.push(snapshot.val()))
+        }
+    })
+
+</script>
+</body>
+</html>
