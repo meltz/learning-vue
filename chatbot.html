@@ -15,11 +15,22 @@
     <div v-for="message in messages" class="card">
         <div class="card-body">
             <h6 class="card-subtitle mb-2 text-muted">{{ message.nickname }}</h6>
-            <p class="card-text">{{ message.text }}</p>
+
+            <p v-if="message !== editingMessage" class="card-text">{{ message.text }}</p>
+            <textarea v-else v-model="messageText" class="form-control"></textarea>
+
+            <div v-if="message !== editingMessage">
+                <a href="#" @click.prevent="deleteMessage(message)" class="card-link">Delete</a>
+                <a href="#" @click.prevent="editMessage(message)" class="card-link">Edit</a>
+            </div>
+            <div v-else>
+                <a href="#" @click.prevent="cancelEditing" class="card-link">Cancel</a>
+                <a href="#" @click.prevent="updateMessage" class="card-link">Update</a>
+            </div>
         </div>
     </div>
     <hr>
-    <form @submit.prevent="storeMessage">
+    <form v-if="!editingMessage" @submit.prevent="storeMessage">
         <div class="form-group">
             <label>Message:</label>
             <textarea v-model="messageText" class="form-control"></textarea>
@@ -44,23 +55,52 @@
     firebase.initializeApp(config);
 
     const database = firebase.database()
+    const messageRef = database.ref('messages')
 
     new Vue ({
         el: '#chat',
         data: {
             messages: [],
+            nickname: 'meltz',
             messageText: '',
-            nickname: 'meltz'
+            editingMessage: null
         },
         methods: {
             storeMessage() {
-                this.messages.push({ text: this.messageText, nickname: this.nickname })
+                messageRef.push({ nickname: this.nickname, text: this.messageText })
                 this.messageText = ''
+            },
+            deleteMessage(message) {
+                messageRef.child(message.id).remove()
+            },
+            editMessage(message) {
+                this.editingMessage = message
+                this.messageText = message.text
+            },
+            cancelEditing() {
+                this.editingMessage = null
+                this.messageText = ''
+            },
+            updateMessage() {
+                messageRef.child(this.editingMessage.id).update({ text: this.messageText })
+                this.cancelEditing()
             }
         },
         // If you link the created hook, you can directly execute code as soon as the program starts.
         created() {
-            database.ref('messages').on('child_added', snapshot => this.messages.push(snapshot.val()))
+            messageRef.on('child_added', snapshot => this.messages.push({ ...snapshot.val(), id: snapshot.key} ))
+
+            messageRef.on('child_removed', snapshot => {
+                const deletedMessage = this.messages.find(message => message.id === snapshot.key)
+                const index = this.messages.indexOf(deletedMessage)
+                this.messages.splice(index, 1)
+            })
+
+            messageRef.on('child_changed', snapshot => {
+                const updatedMessage = this.messages.find(message => message.id === snapshot.key)
+                updatedMessage.text = snapshot.val().text
+                updatedMessage.nickname = snapshot.val().nickname
+            })
         }
     })
 
