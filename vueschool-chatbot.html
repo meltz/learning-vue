@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Document</title>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
-  <script src="https://www.gstatic.com/firebasejs/5.5.9/firebase.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>Document</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://unpkg.com/native-toast@2.0.0/dist/native-toast.css">
+<script src="https://www.gstatic.com/firebasejs/5.5.9/firebase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+<script src="https://unpkg.com/native-toast@2.0.0/dist/native-toast.min.js"></script>
 </head>
 <body>
 <div id="chat" class="container">
@@ -84,22 +86,46 @@
             updateMessage() {
                 messageRef.child(this.editingMessage.id).update({ text: this.messageText })
                 this.cancelEditing()
+            },
+            displayToast(type, displayText) {
+
             }
         },
         // If you link the created hook, you can directly execute code as soon as the program starts.
         created() {
-            messageRef.on('child_added', snapshot => this.messages.push({ ...snapshot.val(), id: snapshot.key} ))
+            messageRef.on('child_added', snapshot => {
+                this.messages.push({...snapshot.val(), id: snapshot.key})
+                if(snapshot.val().nickname !== this.nickname) {
+                    nativeToast({
+                        message: `New message by ${snapshot.val().nickname}`,
+                        type: 'success',
+                        position: 'center'
+                    })
+                }
+            })
 
             messageRef.on('child_removed', snapshot => {
                 const deletedMessage = this.messages.find(message => message.id === snapshot.key)
                 const index = this.messages.indexOf(deletedMessage)
                 this.messages.splice(index, 1)
+                if(snapshot.val().nickname !== this.nickname) {
+                    nativeToast({
+                        message: `Message deleted by ${snapshot.val().nickname}`,
+                        type: 'warning'
+                    })
+                }
             })
 
             messageRef.on('child_changed', snapshot => {
                 const updatedMessage = this.messages.find(message => message.id === snapshot.key)
                 updatedMessage.text = snapshot.val().text
                 updatedMessage.nickname = snapshot.val().nickname
+                if(snapshot.val().nickname !== this.nickname) {
+                    nativeToast({
+                        message: `Message edited by ${snapshot.val().nickname}`,
+                        type: 'info'
+                    })
+                }
             })
         }
     })
