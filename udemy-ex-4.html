@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://npmcdn.com/vue/dist/vue.js"></script>
+    <style>
+    /* 1) */
+    #effect {
+        background-color: grey;
+        width: 100px;
+        height: 100px;
+    }
+
+    .highlight {
+        border: 5px solid yellow !important;
+    }
+
+    .shrink {
+        width: 20px !important;
+        height: 20px !important;
+    }
+
+    /* 2) */
+    .block-div {
+        display: block;
+        padding: 10px;
+    }
+
+    .green-bg {
+        background-color:  green;
+    }
+
+    .text-white {
+        color: white;
+        font-weight: bold;
+    }
+
+    /* 3) */
+    .red {
+        background-color: red;
+        width: 20px;
+        height: 20px;
+    }
+
+    .blue {
+        background-color: blue;
+        width: 100px;
+        height: 100px;
+    }
+
+    .float-right {
+        float: right;
+    }
+
+    /* 5) */
+    .progressBarOuter {
+        display: block;
+        width: 100%;
+        border: 1px solid black;
+    }
+
+    .progressBar {
+        display: block;
+        background-color: brown;
+        padding: 10px 0;
+    }
+
+    .progressBar .text {
+        display: block;
+        margin: 10px;
+        font-weight: bold;
+        color: white;
+    }
+    </style>
+</head>
+<body>
+    <div id="exercise">
+        <!-- 1) Start the Effect with the Button. The Effect should alternate the "highlight" or "shrink"
+        class on each new setInterval tick (attach respective class to the div with id "effect" below) -->
+        <p>1st Exercise:</p>
+        <div>
+            <button @click="startEffect">Start Effect Switch</button>
+            <p>{{ effectClasses }}</p>
+            <div id="effect" :class="effectClasses"></div>
+        </div>
+        <br>
+
+        <!-- 2) Create a couple of CSS classes and attach them via the array syntax -->
+        <p>2nd Exercise:</p>
+        <div :class="['block-div', 'green-bg', 'text-white']">I got no class :(</div>
+        <br>
+
+        <!-- 3) Let the user enter a class (create some example classes) and attach it -->
+        <p>3rd Exercise:</p>
+        <div>
+            <input type="text" v-model="thirdCss" placeholder="Input class name">
+            <div :class="thirdCss"></div>
+        </div>
+        <br>
+
+        <!-- 4) Let the user enter a class and enter true/ false for another class (create some example classes) and attach the classes -->
+        <p>4th Exercise:</p>
+        <div>
+            <input type="text" v-model="thirdCss" placeholder="Input class name">
+            <input type="text" v-model="isHighlight" placeholder="highlight true or false">
+            <div :class="[{highlight: isHighlight}, thirdCss]"></div>
+        </div>
+        <br>
+
+        <!-- 5) Repeat 3) but now with values for styles (instead of class names). Attach the respective styles.  -->
+        <p>5th Exercise:</p>
+        <div>
+            <input type="text" v-model="fiveCss.backgroundColor" placeholder="Input color">
+            <div :style="fiveCss" class="blue"></div>
+        </div>
+        <br>
+
+        <!-- 6) Create a simple progress bar with setInterval and style bindings. Start it by hitting the below button. -->
+        <p>6th Exercise:</p>
+        <div>
+            <button @click="startProgress">Start Progress</button>
+            <button @click="resetProgress">Reset Progress</button>
+            <div class="progressBarOuter">
+                <div class="progressBar" :style="{width: progressBarWidth + '%'}"><span class="text">{{ progressBarWidth }}%</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    new Vue({
+        el: '#exercise',
+        data: {
+            effectClasses: {
+                highlight: true,
+                shrink: false
+            },
+            thirdCss: '',
+            isHighlight: true,
+            fiveCss: {
+                width: '100px',
+                height: '100px',
+                backgroundColor: 'grey'
+            },
+            progressBarWidth: 0
+        },
+        methods: {
+            startEffect() {
+                setInterval(() => {
+                    this.effectClasses.highlight = !this.effectClasses.highlight
+                    this.effectClasses.shrink = !this.effectClasses.shrink
+                }, 1000)
+            },
+            startProgress() {
+                setInterval(() => {
+                    if(this.progressBarWidth < 100) {
+                        this.progressBarWidth += 10
+                    }
+                }, 1000)
+            },
+            resetProgress() {
+                this.progressBarWidth = 0
+            }
+        }
+
+    })
+    </script>
+</body>
+</html>

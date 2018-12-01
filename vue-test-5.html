@@ -35,30 +35,27 @@
 </head>
 <body>
     <div id="app">
-        <div
-            class="demo"
-            @click="changeRed"
-            :class="attachedRed"
-        >
-        </div>
+        <div class="demo" :style="{'background-color': color}"></div>
+        <div class="demo" :style="myStyle"></div>
+        <div class="demo" :style="[myStyle, {height: width +'px'}]"></div>
 
-        <div class="demo"></div>
-
-        <div class="demo" :class="color"></div>
-
-        <input type="text" v-model="color" placeholder="Change 3rd square color">
+        <input type="text" v-model="color">
+        <input type="text" v-model="width">
     </div>
 
     <script>
         new Vue({
             el: '#app',
             data: {
-                color: 'green',
-                attachedRed: 'red'
+                color: 'grey',
+                width: 100
             },
-            methods: {
-                changeRed() {
-                    return this.attachedRed == 'red' ? this.attachedRed = '' : this.attachedRed = 'red';
+            computed: {
+                myStyle() {
+                    return {
+                        backgroundColor: this.color,
+                        width: this.width + 'px'
+                    }
                 }
             }
         });

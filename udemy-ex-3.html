@@ -38,9 +38,9 @@
         watch: {
             result() {
                 var vm = this;
-                setTimeout(function() {
-                    vm.value = 0;
-                }, vm.timeout)
+                setTimeout(() => {
+                    this.value = 0;
+                }, this.timeout)
             }
         }
     })
