@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>Document</title>
+<link rel="stylesheet" href="vueschool-validation.css">
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+<script src="vuelidate.min.js"></script>
+<script src="validators.min.js"></script>
+</head>
+<body>
+<div id="app" class="container">
+    <h1>Form Validation</h1>
+    <form @submit.prevent="submitForm" autocomplete="off">
+
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input v-model="$v.form.name.$model"
+                :class="{ error: $v.form.name.$error, valid: !$v.form.name.$invalid }"
+                id="name">
+            <p v-if="$v.form.name.$error" class="error-message">The name field is required.</p>
+            <!-- <p>Invalid: {{ $v.form.name.$invalid }} | Dirty: {{ $v.form.name.$dirty }} | Error: {{ $v.form.name.$error }}</p> -->
+        </div>
+
+        <div class="form-group">
+            <label for="age">Age:</label>
+            <input v-model.number="$v.form.age.$model"
+                :class="{ error: $v.form.age.$error, valid: !$v.form.age.$invalid }"
+                id="age">
+                <div v-if="$v.form.age.$error">
+                    <p v-if="!$v.form.age.required" class="error-message">The age field is required.</p>
+                    <p v-else-if="!$v.form.age.integer" class="error-message">The age field should be integer.</p>
+                    <p v-else-if="!$v.form.age.between" class="error-message">Your age should be between 12 and 120.</p>
+                </div>
+                <!-- <p>Invalid: {{ $v.form.age.$invalid }} | Dirty: {{ $v.form.age.$dirty }} | Error: {{ $v.form.age.$error }}</p> -->
+        </div>
+
+        <div>
+            <button>Submit</button>
+            <!-- <button :disabled="$v.form.$invalid">Submit</button> -->
+        </div>
+    </form>
+</div>
+<script>
+    Vue.use(vuelidate.default)
+    new Vue ({
+        el: '#app',
+        data() {
+            return {
+                form: {
+                    name: null,
+                    age: null
+                }
+            }
+        },
+        validations: {
+            form: {
+                name: {
+                    required: validators.required
+                },
+                age: {
+                    required: validators.required,
+                    integer: validators.integer,
+                    between: validators.between(12, 120)
+                }
+            }
+        },
+        // computed: {
+        //     nameIsValid() {
+        //         return !!this.form.name
+        //     },
+        //     ageIsValid() {
+        //         return typeof this.form.age === 'number' && this.form.age > 12 && this.form.age < 120
+        //     },
+        //     formIsValid() {
+        //         return this.nameIsValid && this.ageIsValid
+        //     }
+        // },
+        methods: {
+            submitForm() {
+                this.$v.form.$touch()
+                
+                if(!this.$v.form.$invalid) {
+                    console.log('Form Submitted', this.form)
+                }
+                else {
+                    console.log('Invalid form')
+                }
+            }
+        },
+    })
+
+</script>
+</body>
+</html>

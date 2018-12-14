@@ -6,22 +6,26 @@
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 <title>Document</title>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+<script src="https://www.gstatic.com/firebasejs/5.5.9/firebase.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
 </head>
 <body>
 <div id="app" class="container">
-    <h1>Form Validation</h1>
-
 </div>
 <script>
+    // Initialize Firebase
+    const config = {
+        apiKey: "AIzaSyC0ra7Kq0TkAKqUcDjw-RmlsE8NB3PrkNo",
+        authDomain: "chatbot-518ec.firebaseapp.com",
+        databaseURL: "https://chatbot-518ec.firebaseio.com",
+        projectId: "chatbot-518ec",
+        storageBucket: "chatbot-518ec.appspot.com",
+        messagingSenderId: "31862629363"
+    };
+    firebase.initializeApp(config);
 
     new Vue ({
-        el: '#chat',
-        data: {
-        },
-        methods: {
-            }
-        },
+        el: '#app',
     })
 
 </script>
