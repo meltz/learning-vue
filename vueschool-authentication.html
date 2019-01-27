@@ -11,23 +11,146 @@
 </head>
 <body>
 <div id="app" class="container">
+    <h1>Firebase Authentication</h1>
+
+    <div v-if="authUser">
+        <h2>Signed in as {{ authUser.email }}</h2>
+        <p>We know you like {{ authUser.favoriteFood || 'food' }}</p>
+        <img :src="authUser.photoURL" height="150">
+        <br>
+        <br>
+        <p>Yoz, {{ authUser.displayName || 'mate' }}</p>
+        <button @click="signOut">Sign Out</button>
+
+        <form @submit.prevent="updateProfile">
+            <h2>Update Profile</h2>
+            <input v-model="displayName" placeholder="Your Name">
+            <input v-model="photoURL" placeholder="Your photo URL">
+            <button>Update</button>
+        </form>
+
+        <form @submit.prevent="updateCustomDetails">
+            <h2>Update Additional Details</h2>
+            <input v-model="favoriteFood" placeholder="Your Favorite Food">
+            <button>Update</button>
+        </form>
+
+
+        <form @submit.prevent="updateEmail">
+            <h2>Update Email</h2>
+            <input v-model="email" placeholder="Your Email">
+            <button>Update</button>
+        </form>
+
+        <form @submit.prevent="updatePassword">
+            <h2>Update Password</h2>
+            <input type="password" v-model="newPassword" placeholder="Your Password">
+            <button>Update</button>
+        </form>
+
+    </div>
+    <div v-else>
+        <form @submit.prevent="register">
+            <h2>Register</h2>
+            <input type="email" v-model="email" placeholder="Type your email">
+            <input type="password" v-model="password" placeholder="Pick your password">
+            <button>Register</button>
+        </form>
+
+        <form @submit.prevent="signIn">
+            <h2>Sign In</h2>
+            <input type="email" v-model="email" placeholder="Type your email">
+            <input type="password" v-model="password" placeholder="Type your password">
+            <button>Sigin</button>
+        </form>
+
+        <div>
+            <h2>Sign In with Google</h2>
+            <button @click="signInWithGoogle">Sigin with Google</button>
+        </div>
+
+    </div>
 </div>
 <script>
-    // Initialize Firebase
-    const config = {
-        apiKey: "AIzaSyC0ra7Kq0TkAKqUcDjw-RmlsE8NB3PrkNo",
-        authDomain: "chatbot-518ec.firebaseapp.com",
-        databaseURL: "https://chatbot-518ec.firebaseio.com",
-        projectId: "chatbot-518ec",
-        storageBucket: "chatbot-518ec.appspot.com",
-        messagingSenderId: "31862629363"
-    };
-    firebase.initializeApp(config);
+// Initialize Firebase
+const config = {
+    apiKey: "AIzaSyC0ra7Kq0TkAKqUcDjw-RmlsE8NB3PrkNo",
+    authDomain: "chatbot-518ec.firebaseapp.com",
+    databaseURL: "https://chatbot-518ec.firebaseio.com",
+    projectId: "chatbot-518ec",
+    storageBucket: "chatbot-518ec.appspot.com",
+    messagingSenderId: "31862629363"
+};
+firebase.initializeApp(config);
 
-    new Vue ({
-        el: '#app',
-    })
-
+new Vue ({
+    el: '#app',
+    data: {
+        email: '',
+        password: '',
+        authUser: null,
+        displayName: null,
+        photoURL: null,
+        newPassword: null,
+        favoriteFood: null
+    },
+    methods: {
+        register() {
+              firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
+              // .then(() => console.log('all good!'))
+                  .catch(error => alert(error.message))
+        },
+        signOut() {
+            firebase.auth().signOut()
+        },
+        signIn() {
+            firebase.auth().signInWithEmailAndPassword(this.email, this.password)
+            // .then(() => console.log('all good!'))
+                .catch(error => alert(error.message))
+        },
+        signInWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider()
+            firebase.auth().signInWithPopup(provider)
+                .catch(error => alert(error.message))
+                .then(data => console.log(data.user, data.credential.accessToken))
+        },
+        updateProfile() {
+            this.authUser.updateProfile({
+                displayName: this.displayName,
+                photoURL: this.photoURL
+            })
+        },
+        updateEmail() {
+            this.authUser.updateEmail(this.email)
+                .catch(error => alert(error.message))
+        },
+        updatePassword() {
+            this.authUser.updatePassword(this.newPassword)
+                .catch(error => alert(error.message))
+                .then(() => { this.newPassword = null })
+        },
+        updateCustomDetails() {
+            firebase.database().ref('users').child(this.authUser.uid)
+                .update({ favoriteFood: this.favoriteFood })
+        }
+    },
+    created() {
+        firebase.auth().onAuthStateChanged(user => {
+            this.authUser = user
+            if(user) {
+                this.displayName = user.displayName,
+                this.photoURL = user.photoURL,
+                this.email = user.email
+                firebase.database().ref('users').child(user.uid).once('value', snapshot => {
+                    if(snapshot.val()) {
+                        this.favoriteFood = snapshot.val().favoriteFood
+                        Vue.set(this.authUser, 'favoriteFood', this.favoriteFood)
+                    }
+                })
+            }
+        })
+    }
+})
 </script>
 </body>
 </html>
