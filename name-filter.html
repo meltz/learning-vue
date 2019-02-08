@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<div id="app">
+    <button @click="tryme">Click Me</button>
+    <p>{{ message }}</p>
+
+    <h1>Users</h1>
+    <input v-model="findName" id="findname" placeholder="Find User">
+    <ul>
+        <li v-for="name in filteredNames">
+            {{ name }}
+        </li>
+    </ul>
+
+    <h1>Counter</h1>
+    <p>{{ counter }}</p>
+    <input type="number" v-model="counter">
+
+    <h1>Change title to uppercase</h1>
+    <p>{{ title }}</p>
+    <button @click="upperCase">Uppercase</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script>
+	new Vue ({
+		el: '#app',
+		data: {
+            message: null,
+            findName: '',
+            names: [
+                'Evan You',
+                'John Lindquist',
+                'Jen Looper',
+                'Miriam Suzanne',
+                'meltz mz',
+                'meltz dz'
+            ],
+            counter: 0,
+            title: 'Click to transform title to uppercase'
+		},
+		methods: {
+            tryme() {
+                this.message = Date()
+            },
+            upperCase() {
+                return this.title = this.title.toUpperCase()
+            }
+		},
+        computed: {
+            filteredNames() {
+                let filter = new RegExp(this.findName, 'i')
+                return this.names.filter(el => el.match(filter))
+            }
+        },
+        watch: {
+            counter() {
+                console.log('Counter has changed')
+            }
+        }
+	});
+</script>
+
+</body>
+</html>
